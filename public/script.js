@@ -449,7 +449,9 @@ let selectedWeight = '1.0';
 function updateBirthdayCake(flavor) {
     selectedFlavor = flavor;
     const cakeImg = document.getElementById('birthdayCakeImg');
-    if (cakeImg) cakeImg.src = bdayCakes[flavor].img;
+    if (cakeImg && bdayCakes[flavor]) {
+        cakeImg.src = bdayCakes[flavor].img;
+    }
 
     if (event && event.target) {
         event.target.parentElement.querySelectorAll('button').forEach(b => b.classList.remove('active'));
