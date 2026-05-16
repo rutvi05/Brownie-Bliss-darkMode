@@ -1,54 +1,19 @@
 // --- CONFIG ---
+
 const API_BASE = '/api';
 
-// Same catalog as api/index.js seed — used when /api/products is unavailable (no DB, offline, file://).
-const FALLBACK_DB_PRODUCTS = [
-    { type: 'standard', id_ref: 1, name: 'Velvet Dream Cake', category: 'cakes', price: 850, emoji: '🎂', img: 'https://theobroma.in/cdn/shop/files/redvelvet-theo.jpg?v=1701321860' },
-    { type: 'standard', id_ref: 2, name: 'Dutch Truffle Delight', category: 'cakes', price: 950, emoji: '🍰', img: 'https://theobroma.in/cdn/shop/files/DutchTruffleCakehalfkg_Square_400x400.jpg?v=1711124619' },
-    { type: 'standard', id_ref: 3, name: 'Pineapple Fresh Cream', category: 'cakes', price: 675, emoji: '🍍', img: 'https://theobroma.in/cdn/shop/files/FreshCreamPineappleCakehalfkg_5e299618-cc46-4daf-953d-65616ca0299f_400x400.jpg?v=1711124785' },
-    { type: 'standard', id_ref: 4, name: 'Overload Brownie', category: 'brownies', price: 120, emoji: '🍫', img: 'https://theobroma.in/cdn/shop/files/OverloadBrownie_400x400.jpg?v=1711183338' },
-    { type: 'standard', id_ref: 5, name: 'Walnut Fudge', category: 'brownies', price: 95, emoji: '🥜', img: 'https://theobroma.in/cdn/shop/files/WalnutBrownie_400x400.jpg?v=1711183181' },
-    { type: 'standard', id_ref: 6, name: 'Classic Choco', category: 'brownies', price: 80, emoji: '🍫', img: 'https://theobroma.in/cdn/shop/files/eggless-theo-overload-brownie-6.jpg?v=1681320427' },
-    { type: 'standard', id_ref: 7, name: 'Chocolate Mousse', category: 'desserts', price: 150, emoji: '🍮', img: 'https://theobroma.in/cdn/shop/files/Delicacies-04.jpg?v=1681320427' },
-    { type: 'standard', id_ref: 8, name: 'Tiramisu Jar', category: 'desserts', price: 180, emoji: '☕', img: 'https://theobroma.in/cdn/shop/files/TiramisuPastry_400x400.jpg?v=1711125219' },
-    { type: 'standard', id_ref: 9, name: 'Choco Chip Cookies', category: 'cookies', price: 250, emoji: '🍪', img: 'https://theobroma.in/cdn/shop/files/Cookie-04_400x400.jpg?v=1701416744' },
-    { type: 'standard', id_ref: 10, name: 'Almond Biscotti', category: 'cookies', price: 300, emoji: '🥖', img: 'https://theobroma.in/cdn/shop/files/Cookie-01_400x400.jpg?v=1681320427' },
-    { type: 'birthday', id_ref: 'Red Velvet', name: 'Red Velvet', price: 850, emoji: '🎂', img: 'https://theobroma.in/cdn/shop/files/redvelvet-theo.jpg?v=1701321860' },
-    { type: 'birthday', id_ref: 'Dutch Truffle', name: 'Dutch Truffle', price: 950, emoji: '🍰', img: 'https://theobroma.in/cdn/shop/files/DutchTruffleCakehalfkg_Square_400x400.jpg?v=1711124619' },
-    { type: 'birthday', id_ref: 'Pineapple', name: 'Pineapple', price: 675, emoji: '🍍', img: 'https://theobroma.in/cdn/shop/files/FreshCreamPineappleCakehalfkg_5e299618-cc46-4daf-953d-65616ca0299f_400x400.jpg?v=1711124785' },
-    { type: 'birthday', id_ref: 'Chocoholic', name: 'Chocoholic', price: 900, emoji: '🍫', img: 'https://theobroma.in/cdn/shop/files/ChocoholicPastry_400x400.jpg?v=1711096267' },
-    { type: 'birthday', id_ref: 'Black Forest', name: 'Black Forest', price: 750, emoji: '🌲', img: 'https://theobroma.in/cdn/shop/files/BlackForestCakehalfkg_Square_400x400.jpg?v=1711124458' },
-    { type: 'birthday', id_ref: 'Cheesecake', name: 'Cheesecake', price: 1200, emoji: '🧀', img: 'https://theobroma.in/cdn/shop/files/BlueberryCheesecakeCup_400x400.jpg?v=1711514632' }
-];
+// --- THEME ---
+function applyTheme(theme) {
+    document.documentElement.classList.toggle('dark', theme === 'dark');
+    const icon = document.getElementById('themeIcon');
+    if (icon) icon.textContent = theme === 'dark' ? '\u2600\uFE0F' : '\uD83C\uDF19';
+}
 
-function buildCatalogFromList(list) {
-    const source = (Array.isArray(list) && list.length > 0) ? list : FALLBACK_DB_PRODUCTS;
-    const standards = source.filter(p => p.type === 'standard');
-    const mapped = standards.map(p => ({
-        id: p.id_ref,
-        name: p.name,
-        category: p.category,
-        price: p.price,
-        emoji: p.emoji,
-        img: p.img
-    }));
-    products = mapped.length > 0 ? mapped : FALLBACK_DB_PRODUCTS.filter(p => p.type === 'standard').map(p => ({
-        id: p.id_ref,
-        name: p.name,
-        category: p.category,
-        price: p.price,
-        emoji: p.emoji,
-        img: p.img
-    }));
-
-    const birthdaysFromApi = source.filter(p => p.type === 'birthday');
-    bdayCakes = {};
-    FALLBACK_DB_PRODUCTS.filter(p => p.type === 'birthday').forEach(p => {
-        bdayCakes[p.id_ref] = { price: p.price, emoji: p.emoji, img: p.img };
-    });
-    birthdaysFromApi.forEach(p => {
-        bdayCakes[p.id_ref] = { price: p.price, emoji: p.emoji, img: p.img };
-    });
+function toggleTheme() {
+    const isDark = document.documentElement.classList.contains('dark');
+    const next = isDark ? 'light' : 'dark';
+    localStorage.setItem('bb_theme', next);
+    applyTheme(next);
 }
 
 // --- PRODUCTS DATA ---
@@ -324,8 +289,29 @@ async function sendOTP() {
     checkoutState.email = email;
 
     // Bypassing OTP
-    checkoutState.verified = true;
-    showCheckoutStep(3);
+    const btn = document.querySelector('#checkStep1 .hero-cta');
+if (btn) { btn.disabled = true; btn.textContent = 'Sending...'; }
+
+try {
+  const res = await fetch(`${API_BASE}/send-otp`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ phone })
+  });
+  const data = await res.json();
+
+  if (data.success) {
+    document.getElementById('otpPhoneDisp').textContent = '+91 ' + phone;
+    showCheckoutStep(2);
+    showToast('OTP sent! Check your phone.');
+  } else {
+    showToast(data.message || 'Failed to send OTP. Try again.');
+  }
+} catch (e) {
+  showToast('Server error. Please try again.');
+} finally {
+  if (btn) { btn.disabled = false; btn.textContent = 'Send Verification OTP →'; }
+ }
 }
 
 function otpNext(input, idx) {
@@ -442,10 +428,7 @@ async function placeOrder() {
             saveCart();
             updateCartUI();
             closeCheckout();
-            const okMsg = data.message && String(data.message).includes('memory mode')
-                ? '🎉 Order placed! (Demo: orders reset when the server restarts — set MONGO_URI to save in the database.)'
-                : '🎉 Order placed successfully!';
-            showToast(okMsg);
+            showToast(`🎉 Order ${orderId} placed! <a href="track.html?id=${orderId}" class="toast-track-link">Track Order</a>`);
         } else {
             const errText = (data && (data.message || data.error)) ? String(data.message || data.error) : '';
             showToast(errText || `Could not save order (HTTP ${res.status}). Try again or check the server.`);
@@ -521,37 +504,79 @@ let selectedWeight = '1.0';
 // bdayCakes object is now populated dynamically via loadProducts()
 
 function updateBirthdayCake(flavor) {
-    selectedFlavor = flavor;
-    const cakeImg = document.getElementById('birthdayCakeImg');
-    if (cakeImg && bdayCakes[flavor]) cakeImg.src = bdayCakes[flavor].img;
 
-    if (event && event.target) {
-        event.target.parentElement.querySelectorAll('button').forEach(b => b.classList.remove('active'));
-        event.target.classList.add('active');
+    if (!bdayCakes[flavor]) {
+        console.error("Cake flavor not found:", flavor);
+        return;
     }
+
+    selectedFlavor = flavor;
+
+    // Update image
+    const cakeImg = document.getElementById('birthdayCakeImg');
+
+    if (cakeImg) {
+        cakeImg.src = bdayCakes[flavor].img;
+    }
+
+    // Update active flavor button
+    document.querySelectorAll('.flavor-btn').forEach(btn => {
+        btn.classList.remove('active');
+
+        if (btn.textContent.trim() === flavor) {
+            btn.classList.add('active');
+        }
+    });
+
     calculateBdayPrice();
 }
-
 function setCakeWeight(weight) {
+
     selectedWeight = weight;
+
+    const weightButtons = document.querySelectorAll(
+        'button[onclick^="setCakeWeight"]'
+    );
+
+    weightButtons.forEach(btn => {
+        btn.classList.remove('active');
+    });
+
     if (event && event.target) {
-        event.target.parentElement.querySelectorAll('button').forEach(b => b.classList.remove('active'));
         event.target.classList.add('active');
     }
+
     calculateBdayPrice();
 }
 
 function calculateBdayPrice() {
-    if (!bdayCakes[selectedFlavor]) return; // Wait until loaded
-    const finalPrice = bdayCakes[selectedFlavor].price * parseFloat(selectedWeight);
+
+    const basePrices = {
+        "0.5": 450,
+        "1.0": 850,
+        "1.5": 1250,
+        "2.0": 1600
+    };
+
+    const finalPrice = basePrices[selectedWeight];
+
     const priceEl = document.getElementById('cakePrice');
-    if (priceEl) priceEl.textContent = `₹ ${Math.round(finalPrice)}`;
+
+    if (priceEl) {
+        priceEl.textContent = `₹ ${finalPrice}`;
+    }
 }
 
 function addBirthdayToCart() {
-    if (!bdayCakes[selectedFlavor]) return;
-    const finalPrice = bdayCakes[selectedFlavor].price * parseFloat(selectedWeight);
-    const msgInput = document.getElementById('cakeMessage');
+    if (!bdayCakes[selectedFlavor]) return; // Wait until loaded
+const basePrices = {
+    "0.5": 450,
+    "1.0": 850,
+    "1.5": 1250,
+    "2.0": 1600
+};
+
+const finalPrice = basePrices[selectedWeight];    const msgInput = document.getElementById('cakeMessage');
     const message = msgInput ? msgInput.value.trim() : '';
 
     const item = {
@@ -572,13 +597,16 @@ function addBirthdayToCart() {
 function showToast(msg) {
     const toast = document.getElementById('toast');
     if (!toast) return;
-    toast.textContent = msg;
+    toast.innerHTML = msg;
     toast.classList.add('show');
-    setTimeout(() => toast.classList.remove('show'), 3000);
+    setTimeout(() => toast.classList.remove('show'), 5000);
 }
 
 // Initialization
 document.addEventListener('DOMContentLoaded', () => {
+    // Sync toggle icon with current theme (class was set by blocking <script> in <head>)
+    applyTheme(localStorage.getItem('bb_theme') || 'light');
+
     updateCartUI();
     if (document.getElementById('productsGrid')) {
         filterProducts('all');
@@ -598,4 +626,88 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     loadProducts(); // Load and then automatically re-render main grid/birthday block
+
+    // Track Order auto-fill if on track.html
+    const urlParams = new URLSearchParams(window.location.search);
+    const idParam = urlParams.get('id');
+    const input = document.getElementById('orderIdInput');
+    if (idParam && input) {
+        input.value = idParam;
+        trackOrder(idParam);
+    }
 });
+
+// --- TRACK ORDER LOGIC ---
+async function trackOrder(id) {
+    const orderIdInput = document.getElementById('orderIdInput');
+    const trackError = document.getElementById('trackError');
+    if (!orderIdInput) return;
+
+    if (trackError) trackError.style.display = 'none';
+
+    const orderId = id || orderIdInput.value.trim();
+    if (!orderId) {
+        if (trackError) {
+            trackError.textContent = 'Please enter an Order ID';
+            trackError.style.display = 'block';
+        }
+        return;
+    }
+
+    try {
+        const res = await fetch(`${API_BASE}/orders/${orderId}`);
+        const data = await res.json();
+        if (data.success || data.order) {
+            renderOrderDetails(data.order || data);
+        } else {
+            if (trackError) {
+                trackError.textContent = data.error || 'Order not found';
+                trackError.style.display = 'block';
+            }
+            document.getElementById('result').style.display = 'none';
+        }
+    } catch (e) {
+        if (trackError) {
+            trackError.textContent = 'Error fetching order. Make sure the server is running!';
+            trackError.style.display = 'block';
+        }
+        document.getElementById('result').style.display = 'none';
+    }
+}
+
+function renderOrderDetails(order) {
+    const resOrderId = document.getElementById('resOrderId');
+    if (!resOrderId) return; // Not on track page
+
+    resOrderId.textContent = order.id || order.order_id;
+
+    const status = order.status || 'pending';
+    document.getElementById('resStatus').textContent = status.toUpperCase();
+    document.getElementById('resStatus').className = `status-badge status-${status.toLowerCase()}`;
+
+    if (order.created_at) {
+        document.getElementById('resDate').textContent = new Date(order.created_at).toLocaleString();
+    } else {
+        document.getElementById('resDate').textContent = 'N/A';
+    }
+
+    let itemsHtml = '';
+    try {
+        const items = typeof order.items === 'string' ? JSON.parse(order.items) : order.items;
+        itemsHtml = items.map(i => {
+            const itemTotal = (i.price && i.qty) ? i.price * i.qty : i.price || 0;
+            const priceHtml = itemTotal ? `₹${itemTotal.toLocaleString('en-IN')}` : '';
+            return `<tr>
+                        <td>${i.emoji || ''} ${i.name} × ${i.qty}</td>
+                        <td class="text-right track-item-price">${priceHtml}</td>
+                    </tr>`;
+        }).join('');
+    } catch (e) {
+        itemsHtml = `<tr><td colspan="2">${order.items}</td></tr>`;
+    }
+
+    document.getElementById('resItems').innerHTML = itemsHtml;
+    document.getElementById('resTotal').textContent = order.total;
+
+    document.getElementById('result').style.display = 'block';
+}
