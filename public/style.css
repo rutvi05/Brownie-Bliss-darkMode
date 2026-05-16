@@ -2253,3 +2253,52 @@ a.logo {
   font-size: 14px;
   font-weight: 500;
 }
+.menu-toggle{
+  display:none;
+  background:none;
+  border:none;
+  font-size:28px;
+  cursor:pointer;
+  color:var(--brown-dark);
+}
+
+.mobile-menu{
+  display:none;
+  flex-direction:column;
+  background:white;
+  padding:15px;
+}
+
+.mobile-menu a{
+  text-decoration:none;
+  color:var(--brown-dark);
+  padding:10px 0;
+  border-bottom:1px solid #eee;
+}
+
+@media (max-width:900px){
+
+  nav{
+    display:none;
+  }
+
+  .menu-toggle{
+    display:block;
+  }
+
+  .mobile-menu.show{
+    display:flex;
+    flex-direction:column;
+  }
+  .header-inner{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.menu-toggle{
+  order:-1;
+  margin-right:15px;
+}
+
+}
