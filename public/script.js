@@ -62,7 +62,6 @@ function useFallbackProducts() {
 
 const FAVOURITES_KEY = 'brownie_bliss_favourites';
 
-let favourites = loadFavourites();
 
 function buildCatalogFromList(list) {
     if (list && Array.isArray(list) && list.length) {
@@ -140,15 +139,6 @@ async function loadProducts() {
 }
 
 // --- CART ---
-    // Render UI
-    if (document.getElementById('productsGrid')) {
-        filterProducts('all');
-    }
-
-    if (document.getElementById('cakePrice')) {
-        calculateBdayPrice();
-    }
-}
 // --- CART STATE ---
 let cart = JSON.parse(localStorage.getItem('brownie_bliss_cart') || '[]');
 let checkoutState = { name: '', phone: '', address: '', city: '', pincode: '', verified: false, currentStep: 1 };
@@ -258,6 +248,9 @@ function filterProducts(category) {
             <button onclick='addToCart(${JSON.stringify(p)})'>
                 Add to Cart
             </button>
+        </div>
+    `).join('');
+}
 function removeFromCart(index) {
     cart.splice(index, 1);
     saveCart();
@@ -556,10 +549,6 @@ async function placeOrder() {
 }
 
 // --- WHATSAPP FINAL ---
-function sendWhatsAppFinal(orderId) {
-    const total = cart.reduce((s, i) => s + i.price * i.qty, 0);
-    const itemLines = cart.map(i => {
-        let line = `• ${i.name} × ${i.qty} = ₹${(i.price * i.qty).toLocaleString()}`;
 function sendWhatsAppFinal(orderId, itemsSnap, orderTotal) {
 
     const lines = Array.isArray(itemsSnap) && itemsSnap.length
@@ -569,8 +558,6 @@ function sendWhatsAppFinal(orderId, itemsSnap, orderTotal) {
     const total = typeof orderTotal === 'number' && Number.isFinite(orderTotal)
         ? orderTotal
         : lines.reduce((s, i) => s + Number(i.price) * Number(i.qty), 0);
-    const itemLines = lines.map(i => {
-        let line = `• ${i.name} × ${i.qty} = ₹${(Number(i.price) * Number(i.qty)).toLocaleString('en-IN')}`;
 
     const itemLines = lines.map(i => {
         let line = `• ${i.name} × ${i.qty} = ₹${(Number(i.price) * Number(i.qty)).toLocaleString('en-IN')}`;
@@ -726,18 +713,6 @@ function updateBirthdayCake(flavor) {
 
     calculateBdayPrice();
 }
-function setCakeWeight(weight) {
-// --- BIRTHDAY CAKE ---
-let selectedFlavor = "Red Velvet";
-let selectedWeight = "1.0";
-
-const BIRTHDAY_BASE_PRICES = {
-    "0.5": 450,
-    "1.0": 850,
-    "1.5": 1250,
-    "2.0": 1600
-};
-
 function setCakeWeight(weight, event) {
     selectedWeight = weight;
 
@@ -902,16 +877,7 @@ function renderFavouritesPage() {
         `).join('');
     }
 
-    const items = cart.map(i =>
-        `• ${i.name} × ${i.qty} = ₹${i.price * i.qty}`
-    ).join('\n');
 
-    const msg =
-        `🍫 Order ID: ${orderId}\n\n` +
-        `${items}\n\nTotal: ₹${total}`;
-
-    const url = `https://wa.me/918072596340?text=${encodeURIComponent(msg)}`;
-    window.open(url, "_blank");
 }
 
 // --- TOAST ---
@@ -945,6 +911,14 @@ document.addEventListener('DOMContentLoaded', () => {
 // Show/hide button on scroll
 window.addEventListener("scroll", function () {
     const btn = document.getElementById("scrollTopBtn");
+    if (btn) {
+        if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+            btn.style.display = "block";
+        } else {
+            btn.style.display = "none";
+        }
+    }
+});
 
 // --- TRACK ORDER LOGIC ---
 async function trackOrder(id) {
@@ -1057,10 +1031,8 @@ function renderOrderDetails(order) {
 
     if (order.created_at) {
         document.getElementById('resDate').textContent = new Date(order.created_at).toLocaleString();
-    } else {
-        btn.style.display = "none";
     }
-});
+}
 
 // Scroll to top function
 function scrollToTop() {
@@ -1068,6 +1040,9 @@ function scrollToTop() {
         top: 0,
         behavior: "smooth"
     });
+}
+
+function addCustomizedToCart() {
     const message = document.getElementById('customizeMessage').value.trim();
 
     const toppingsTotal = toppings.reduce((s, t) => s + t.price, 0);
@@ -1086,11 +1061,12 @@ function scrollToTop() {
     addToCart(cartItem);
     closeCustomizeModal();
     openCart();
-    // Close mobile menu when any link inside it is clicked
+}
+
+// Close mobile menu when any link inside it is clicked
 document.querySelectorAll('.mobile-menu a').forEach(link => {
   link.addEventListener('click', () => {
     document.getElementById('mobileMenu').classList.remove('show');
   });
 });
-}
 }
