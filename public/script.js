@@ -1,4 +1,3 @@
-script.js
 
 // --- CONFIG ---
 const API_BASE = '/api';
@@ -13,8 +12,6 @@ document.addEventListener("keydown", (e) => {
 // --- THEME ---
 function applyTheme(theme) {
     document.documentElement.classList.toggle('dark', theme === 'dark');
-    const icon = document.getElementById('themeIcon');
-    if (icon) icon.textContent = theme === 'dark' ? '☀️' : '🌙';
 }
 
 function toggleTheme() {
