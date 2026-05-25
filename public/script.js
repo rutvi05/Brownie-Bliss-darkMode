@@ -12,6 +12,10 @@ document.addEventListener("keydown", (e) => {
 // --- THEME ---
 function applyTheme(theme) {
     document.documentElement.classList.toggle('dark', theme === 'dark');
+    const icon = document.getElementById('themeIcon');
+    if (icon) {
+        icon.textContent = '🌙'; // Keep moon, let CSS handle the background
+    }
 }
 
 function toggleTheme() {
